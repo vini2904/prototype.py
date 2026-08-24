@@ -1,0 +1,206 @@
+{
+  "NET-CASE-001": {
+    "status": "Accepted",
+    "reviewer": "Senior Network Engineer",
+    "notes": "Diagnosis is accurate and evidence directly matches the show run output. Approved fix.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-002": {
+    "status": "Accepted",
+    "reviewer": "Senior Network Engineer",
+    "notes": "Classic subinterface prerequisite oversight. Verified parent interface must be brought up.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-003": {
+    "status": "Accepted",
+    "reviewer": "Network Administrator",
+    "notes": "Correct calculation of /25 boundary split. Verified.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-004": {
+    "status": "Accepted",
+    "reviewer": "Lead Infrastructure Architect",
+    "notes": "Pool size expanded to /24. Clearing leases will allow laptop to acquire IP instantly.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-005": {
+    "status": "Edited",
+    "reviewer": "Security Engineer",
+    "notes": "AI identified wildcard mask error correctly, but also forgot that DNS (UDP 53) and HTTPS (TCP 443) may be needed. Added permit for port 443 and domain.",
+    "adjusted_fix": [
+      "R1(config)# ip access-list extended 101",
+      "R1(config-ext-nacl)# no 10",
+      "R1(config-ext-nacl)# 10 permit tcp 172.16.10.0 0.0.0.255 host 10.10.10.80 eq 80",
+      "R1(config-ext-nacl)# 15 permit tcp 172.16.10.0 0.0.0.255 host 10.10.10.80 eq 443",
+      "R1(config-ext-nacl)# end"
+    ]
+  },
+  "NET-CASE-006": {
+    "status": "Accepted",
+    "reviewer": "Senior Routing Engineer",
+    "notes": "Clear evidence in debug logs and running-config. Verified Area 0 alignment.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-007": {
+    "status": "Accepted",
+    "reviewer": "Network Architect",
+    "notes": "Directly resolves the missing default route. Verified ISP next hop is reachable.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-008": {
+    "status": "Accepted",
+    "reviewer": "Senior Network Engineer",
+    "notes": "Verified. Inside interface was omitted during initial configuration.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-009": {
+    "status": "Accepted",
+    "reviewer": "SysAdmin",
+    "notes": "Verified. Fixed DNS server parameter in DHCP pool.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-010": {
+    "status": "Accepted",
+    "reviewer": "Lead Network Engineer",
+    "notes": "Native VLAN must match on both ends of an 802.1Q trunk. Fix is 100% accurate.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-011": {
+    "status": "Accepted",
+    "reviewer": "Cybersecurity Lead",
+    "notes": "Comprehensive RFC1918 isolation rule with essential DHCP/DNS permits.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-012": {
+    "status": "Accepted",
+    "reviewer": "Senior Network Engineer",
+    "notes": "Verified. Uplink to authorized DHCP server must have 'ip dhcp snooping trust'.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-013": {
+    "status": "Accepted",
+    "reviewer": "Infrastructure Lead",
+    "notes": "Spot-on diagnosis. Both routers were in Active state due to VIP mismatch.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-014": {
+    "status": "Accepted",
+    "reviewer": "Senior Routing Engineer",
+    "notes": "Accurate next-hop correction to 10.0.0.1.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-015": {
+    "status": "Accepted",
+    "reviewer": "Network Engineer",
+    "notes": "Verified. Classic DHCP relay requirement across routed boundaries.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-016": {
+    "status": "Accepted",
+    "reviewer": "Field Support Tech",
+    "notes": "Simple shutdown port. Approved fix.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-017": {
+    "status": "Accepted",
+    "reviewer": "Senior Network Engineer",
+    "notes": "Always use 'add' keyword so existing allowed VLANs are not overwritten. Fix confirmed.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-018": {
+    "status": "Accepted",
+    "reviewer": "Senior Engineer",
+    "notes": "Verified. Appending permit for second subnet restores NAT translation.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-019": {
+    "status": "Accepted",
+    "reviewer": "Infrastructure Engineer",
+    "notes": "Matches textbook duplex mismatch signature: late collisions on half-duplex side + CRC errors.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-020": {
+    "status": "Accepted",
+    "reviewer": "Security Lead",
+    "notes": "Standard ACLs should be placed close to destination, or use Extended ACL with specific destination IP.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-021": {
+    "status": "Accepted",
+    "reviewer": "Network Engineer",
+    "notes": "Upgraded R2 to RIPv2 with auto-summary disabled for proper VLSM support.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-022": {
+    "status": "Accepted",
+    "reviewer": "Security Admin",
+    "notes": "Resetting the err-disabled state with sticky MAC configuration is standard practice.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-023": {
+    "status": "Accepted",
+    "reviewer": "Network Engineer",
+    "notes": "Verified broadcast address boundary check.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-024": {
+    "status": "Edited",
+    "reviewer": "Senior Routing Engineer",
+    "notes": "AI diagnosis correct. Added recommendation to follow best practice: 'passive-interface default' with explicit 'no passive-interface' for routed uplinks.",
+    "adjusted_fix": [
+      "R1# configure terminal",
+      "R1(config)# router ospf 1",
+      "R1(config-router)# no passive-interface GigabitEthernet0/2",
+      "R1(config-router)# end",
+      "R1# write memory"
+    ]
+  },
+  "NET-CASE-025": {
+    "status": "Accepted",
+    "reviewer": "Lead Network Architect",
+    "notes": "Accurately caught 'Access Mode VLAN: (inactive)' condition.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-026": {
+    "status": "Accepted",
+    "reviewer": "Senior Network Engineer",
+    "notes": "Fix excludes router interface IP from pool. Alternatively 'ip nat inside source list 1 interface Gi0/1 overload' can be used.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-027": {
+    "status": "Accepted",
+    "reviewer": "Security Architect",
+    "notes": "Proper enterprise fix for static IPs under DAI using ARP ACL filter.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-028": {
+    "status": "Accepted",
+    "reviewer": "Senior Routing Engineer",
+    "notes": "Standardizing MTU to 1500 allows DBD exchange to complete to FULL state.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-029": {
+    "status": "Accepted",
+    "reviewer": "Network Engineer",
+    "notes": "Verified encapsulation tag typo fix.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-030": {
+    "status": "Accepted",
+    "reviewer": "Cybersecurity Lead",
+    "notes": "Critical security risk resolved by binding Guest WLAN to dedicated isolated VLAN 90 interface.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-031": {
+    "status": "Accepted",
+    "reviewer": "Principal Network Engineer",
+    "notes": "Corrected summary mask from /22 to /21 (255.255.248.0) covering 10.20.0.0 - 10.20.7.255.",
+    "adjusted_fix": null
+  },
+  "NET-CASE-032": {
+    "status": "Accepted",
+    "reviewer": "Senior Engineer",
+    "notes": "Verified. Helper address must point to unicast IP of remote DHCP server.",
+    "adjusted_fix": null
+  }
+}

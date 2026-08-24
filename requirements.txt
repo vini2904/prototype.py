@@ -1,0 +1,4 @@
+# NetSage AI - Dependencies
+# Python 3.8+ is required.
+# All core capabilities (HTTP server, regex, ipaddress, json, socketserver) 
+# utilize the Python Standard Library. Zero external dependencies required.

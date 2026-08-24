@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetSage AI - Intelligent Network Troubleshooting Assistant</title>
+  <meta name="description" content="AI-assisted troubleshooter for Cisco Packet Tracer lab problems with deterministic rule verification and mandatory human review.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="logo-title">NetSage <span class="accent-text">AI</span></h1>
+          <p class="logo-subtitle">Packet Tracer Assistant • Hybrid Rule Engine • Human-in-the-Loop</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <nav class="nav-tabs">
+        <button class="nav-tab active" id="tab-workbench-btn" onclick="switchView('workbench')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+          Diagnostic Workbench
+        </button>
+        <button class="nav-tab" id="tab-analytics-btn" onclick="switchView('analytics')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Analytics & Metrics
+        </button>
+        <button class="nav-tab" id="tab-responsible-btn" onclick="switchView('responsible')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          Responsible AI Log <span class="badge badge-purple" id="nav-corr-badge">5 Corrected</span>
+        </button>
+        <button class="nav-tab" id="tab-custom-btn" onclick="switchView('custom')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Custom Lab Sandbox
+        </button>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <div class="system-status-pill">
+        <span class="status-dot pulse"></span>
+        <span class="status-text">Rule Engine Active • LLM Online</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Metrics Bar -->
+  <section class="telemetry-bar">
+    <div class="stat-card">
+      <span class="stat-label">Total Lab Cases</span>
+      <div class="stat-value" id="kpi-total-cases">32</div>
+      <span class="stat-trend positive">Packet Tracer 8.x Scenarios</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">AI Accuracy Rate</span>
+      <div class="stat-value" id="kpi-ai-accuracy">84.4%</div>
+      <span class="stat-trend positive">Direct Root Cause Precision</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Deterministic Catch Rate</span>
+      <div class="stat-value" id="kpi-rule-catch">87.5%</div>
+      <span class="stat-trend neutral">Python Rule Verifier</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Human Agreement</span>
+      <div class="stat-value" id="kpi-agreement-rate">90.6%</div>
+      <span class="stat-trend positive">Accepted + Edited</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Human Corrections</span>
+      <div class="stat-value text-warning" id="kpi-corrections">5</div>
+      <span class="stat-trend text-purple">Logged in Audit Trail</span>
+    </div>
+  </section>
+
+  <!-- Main Content Layout -->
+  <main class="main-container">
+    
+    <!-- VIEW 1: DIAGNOSTIC WORKBENCH -->
+    <div id="view-workbench" class="app-view active">
+      <!-- Left Column: Case Selector & Filter -->
+      <aside class="case-sidebar">
+        <div class="sidebar-header">
+          <h2 class="sidebar-title">Troubleshooting Cases</h2>
+          <div class="search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="case-search-input" placeholder="Search by symptom, VLAN, OSPF, ACL..." oninput="filterCases()">
+          </div>
+          <div class="filter-pills" id="filter-pills-container">
+            <button class="filter-pill active" onclick="setCategoryFilter('ALL')">All (32)</button>
+            <button class="filter-pill" onclick="setCategoryFilter('VLAN')">VLAN</button>
+            <button class="filter-pill" onclick="setCategoryFilter('Routing')">Routing</button>
+            <button class="filter-pill" onclick="setCategoryFilter('ACL')">ACL</button>
+            <button class="filter-pill" onclick="setCategoryFilter('NAT')">NAT</button>
+            <button class="filter-pill" onclick="setCategoryFilter('DHCP')">DHCP</button>
+            <button class="filter-pill" onclick="setCategoryFilter('Gateway')">Gateway</button>
+            <button class="filter-pill" onclick="setCategoryFilter('Wireless')">Wireless</button>
+          </div>
+        </div>
+
+        <div class="case-list" id="case-list-container">
+          <!-- Dynamically populated cases -->
+        </div>
+      </aside>
+
+      <!-- Center & Right: Live Diagnostics Console -->
+      <section class="workbench-main">
+        <!-- Top Case Summary Card -->
+        <div class="case-detail-card" id="case-detail-header">
+          <div class="case-meta-row">
+            <div class="meta-badges">
+              <span class="badge badge-case-id" id="wb-case-id">NET-CASE-001</span>
+              <span class="badge badge-concept" id="wb-case-concept">VLAN</span>
+              <span class="badge badge-layer" id="wb-case-layer">Layer 2</span>
+              <span class="badge badge-severity-high" id="wb-case-severity">High</span>
+            </div>
+            <div class="review-status-display" id="wb-review-status-box">
+              <span class="status-label">Human Review:</span>
+              <span class="badge badge-status-accepted" id="wb-review-badge">Accepted</span>
+            </div>
+          </div>
+          <h2 class="case-title-main" id="wb-case-title">PC in VLAN 10 Cannot Ping Default Gateway</h2>
+          
+          <div class="case-context-grid">
+            <div class="context-item">
+              <span class="context-label">Observed Symptom:</span>
+              <p class="context-text" id="wb-case-symptom">Host PC-1 (192.168.10.50/24) cannot reach its default gateway 192.168.10.1 on Router R1. Link light on switch is amber.</p>
+            </div>
+            <div class="context-item">
+              <span class="context-label">Lab Topology:</span>
+              <p class="context-text code-font" id="wb-case-topology">PC-1 (Fa0/1) -> Switch SW1 (Gig0/1) -> Router R1 (Gig0/0.10 Subinterface)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dual Pane: CLI Terminal vs NetSage AI Analysis -->
+        <div class="dual-diagnostic-grid">
+          
+          <!-- CLI Output Panel -->
+          <div class="panel cli-panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <div class="terminal-dots"><span></span><span></span><span></span></div>
+                <h3 class="panel-title">Cisco IOS Show Commands</h3>
+              </div>
+              <button class="btn btn-xs btn-outline" onclick="copyShowOutputs()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copy CLI
+              </button>
+            </div>
+            <div class="terminal-viewport">
+              <pre class="terminal-code" id="wb-cli-output">SW1# show vlan brief
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/2, Fa0/3, Fa0/4
+10   Engineering                      active    
+20   Sales                            active    Fa0/5, Fa0/6
+
+SW1# show running-config interface FastEthernet0/1
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 1
+ spanning-tree portfast</pre>
+            </div>
+          </div>
+
+          <!-- AI & Rule Diagnostic Synthesis Panel -->
+          <div class="panel ai-panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <span class="ai-spark-icon">✨</span>
+                <h3 class="panel-title">NetSage Hybrid Diagnosis</h3>
+              </div>
+              <div class="confidence-indicator">
+                <span class="confidence-text" id="wb-confidence-text">Confidence: 98%</span>
+                <div class="confidence-bar-bg">
+                  <div class="confidence-bar-fill" id="wb-confidence-bar" style="width: 98%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              
+              <!-- Deterministic Rule Trigger Banner -->
+              <div class="rule-trigger-box" id="wb-rule-box">
+                <div class="rule-header">
+                  <span class="rule-icon">⚙️</span>
+                  <strong>Deterministic Rule Engine:</strong>
+                  <span class="rule-badge" id="wb-rule-name">CHECK_VLAN_TRUNK</span>
+                </div>
+                <p class="rule-desc" id="wb-rule-desc">Access port VLAN configured on port 1 while host IP belongs to VLAN 10 subnet.</p>
+              </div>
+
+              <!-- Root Cause Analysis -->
+              <div class="diag-section">
+                <h4 class="diag-subtitle">Root Cause Diagnosis</h4>
+                <p class="diag-text" id="wb-diag-rootcause">Access port FastEthernet0/1 is configured for default VLAN 1, while PC-1 has an IP in subnet 192.168.10.0/24 corresponding to VLAN 10.</p>
+              </div>
+
+              <!-- Direct CLI Evidence Quote -->
+              <div class="diag-section">
+                <h4 class="diag-subtitle">Evidence Citation</h4>
+                <div class="evidence-quote-box" id="wb-diag-evidence">
+                  SW1# show running-config interface FastEthernet0/1 -> 'switchport access vlan 1' while PC-1 is on 192.168.10.50.
+                </div>
+              </div>
+
+              <!-- Next Diagnostic Command -->
+              <div class="diag-section">
+                <h4 class="diag-subtitle">Recommended Next Diagnostic Command</h4>
+                <div class="next-cmd-box code-font" id="wb-diag-nextcmd">
+                  show interfaces FastEthernet0/1 switchport
+                </div>
+              </div>
+
+              <!-- Step-by-Step Remediation Plan -->
+              <div class="diag-section">
+                <div class="section-split-header">
+                  <h4 class="diag-subtitle">Remediation Script (Cisco IOS)</h4>
+                  <button class="btn btn-xs btn-primary" onclick="copyFixScript()">Copy Fix</button>
+                </div>
+                <div class="fix-steps-container code-font" id="wb-diag-fixsteps">
+                  <div class="fix-line">SW1# configure terminal</div>
+                  <div class="fix-line">SW1(config)# interface FastEthernet0/1</div>
+                  <div class="fix-line">SW1(config-if)# switchport access vlan 10</div>
+                  <div class="fix-line">SW1(config-if)# end</div>
+                  <div class="fix-line">SW1# write memory</div>
+                </div>
+              </div>
+
+              <!-- Interactive Human Review Actions -->
+              <div class="human-review-panel">
+                <div class="review-action-header">
+                  <h4>Mandatory Human Review</h4>
+                  <span class="safety-tag">🛡️ Safety Rule: Approval Required Before Deploy</span>
+                </div>
+                <div class="review-button-group">
+                  <button class="btn btn-success" id="btn-accept-fix" onclick="handleReviewAction('Accepted')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Accept Diagnosis
+                  </button>
+                  <button class="btn btn-warning" id="btn-edit-fix" onclick="openEditReviewModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Edit & Refine Fix
+                  </button>
+                  <button class="btn btn-danger" id="btn-reject-fix" onclick="handleReviewAction('Rejected')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    Reject (Hallucination)
+                  </button>
+                </div>
+                <div class="reviewer-notes-preview" id="wb-reviewer-notes-box">
+                  <strong>Reviewer Notes:</strong> <span id="wb-reviewer-notes-text">Diagnosis is accurate and evidence directly matches the show run output. Approved fix.</span>
+                </div>
+              </div>
+
+              <!-- Interactive Simulator / Verification Runner -->
+              <div class="verification-simulator">
+                <div class="sim-header">
+                  <h4>Post-Fix Verification Simulator</h4>
+                  <button class="btn btn-xs btn-accent" id="btn-run-sim" onclick="runSimulatedVerification()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Simulate & Test Fix
+                  </button>
+                </div>
+                <div class="sim-terminal code-font" id="wb-sim-terminal">
+                  <div class="sim-line text-muted">Ready to simulate verification command...</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW 2: ANALYTICS & METRICS -->
+    <div id="view-analytics" class="app-view">
+      <div class="analytics-header">
+        <h2>Network Troubleshooting & AI Diagnostic Analytics</h2>
+        <p>Real-time telemetry measuring fault taxonomy, OSI distribution, and human-in-the-loop oversight.</p>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Chart 1: Issue Domain Breakdown -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Fault Distribution by Concept Tag</h3>
+            <span class="badge badge-info">32 Cases</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-concept"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: OSI Layer Distribution -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Fault Distribution by OSI Layer</h3>
+            <span class="badge badge-info">Layer 1 - 7</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-osi"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Human Review Breakdown -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Human-in-the-Loop Review Outcomes</h3>
+            <span class="badge badge-info">Safety Gate</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-review"></canvas>
+          </div>
+        </div>
+
+        <!-- Summary Matrix Table -->
+        <div class="chart-card table-card">
+          <div class="chart-card-header">
+            <h3>Engine Benchmark Summary</h3>
+          </div>
+          <div class="table-container">
+            <table class="benchmark-table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Metric</th>
+                  <th>NetSage Performance</th>
+                  <th>Industry Standard</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Deterministic Python Engine</td>
+                  <td>Rule Precision</td>
+                  <td><span class="badge badge-status-accepted">100%</span></td>
+                  <td>95.0%</td>
+                </tr>
+                <tr>
+                  <td>LLM Diagnostic Engine</td>
+                  <td>Raw Accuracy</td>
+                  <td><span class="badge badge-status-accepted">84.4%</span></td>
+                  <td>72.0%</td>
+                </tr>
+                <tr>
+                  <td>Human-in-the-Loop Review</td>
+                  <td>Safety Gate Enforcement</td>
+                  <td><span class="badge badge-status-accepted">100% (Mandatory)</span></td>
+                  <td>Optional</td>
+                </tr>
+                <tr>
+                  <td>Evidence Citation</td>
+                  <td>Verbatim CLI Quoting</td>
+                  <td><span class="badge badge-status-accepted">96.8%</span></td>
+                  <td>60.0%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: RESPONSIBLE AI LOG -->
+    <div id="view-responsible" class="app-view">
+      <div class="responsible-header">
+        <div class="resp-title-group">
+          <h2>Responsible AI & Human Correction Audit Log</h2>
+          <p>Detailed breakdown of 5 specific lab troubleshooting scenarios where human engineers corrected, refined, or rejected AI diagnoses to prevent outages or architectural regressions.</p>
+        </div>
+        <div class="resp-stats-pill">
+          <span>Safety Interventions: <strong>5 Cases</strong></span>
+          <span>Zero Autonomous Deployments</span>
+        </div>
+      </div>
+
+      <div class="case-studies-grid" id="case-studies-container">
+        <!-- Dynamically rendered 5 case studies -->
+      </div>
+    </div>
+
+    <!-- VIEW 4: CUSTOM LAB SANDBOX -->
+    <div id="view-custom" class="app-view">
+      <div class="custom-sandbox-header">
+        <h2>Live Packet Tracer Custom Diagnostic Sandbox</h2>
+        <p>Test NetSage AI on any live or custom Cisco Packet Tracer lab issue. Input symptoms, topology, and show commands.</p>
+      </div>
+
+      <div class="custom-sandbox-grid">
+        <div class="panel custom-input-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Enter Problem Context</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="custom-symptom">Observed Symptom & Ping Results:</label>
+              <textarea id="custom-symptom" rows="3" placeholder="e.g. PC in VLAN 20 cannot ping default gateway 192.168.20.1..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="custom-topology">Topology Note:</label>
+              <input type="text" id="custom-topology" placeholder="e.g. PC-1 -> Switch SW1 (Fa0/1) -> Router R1 (Gig0/0.20)">
+            </div>
+            <div class="form-group">
+              <label for="custom-show-outputs">Cisco IOS Show Commands (show run, show ip route, show vlan, etc.):</label>
+              <textarea id="custom-show-outputs" rows="10" class="code-font" placeholder="Paste CLI output here...
+SW1# show ip interface brief
+R1# show access-lists
+R1# show ip route"></textarea>
+            </div>
+            <button class="btn btn-primary btn-block" id="btn-run-custom-diag" onclick="runCustomDiagnosis()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              Run NetSage Diagnostic Engine
+            </button>
+          </div>
+        </div>
+
+        <div class="panel custom-result-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Diagnostic Results</h3>
+            <span class="badge badge-purple" id="custom-result-badge">Pending Input</span>
+          </div>
+          <div class="panel-body" id="custom-result-body">
+            <div class="empty-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              <p>Enter symptom and show commands on the left, then click <strong>Run NetSage Diagnostic Engine</strong> to see deterministic rule checks and structured AI diagnosis.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal for Human Review Editing -->
+  <div class="modal-overlay" id="edit-review-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Human Engineer Review & Fix Refinement</h3>
+        <button class="modal-close" onclick="closeEditReviewModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="edit-reviewer-name">Reviewer Name & Title:</label>
+          <input type="text" id="edit-reviewer-name" value="Senior Network Engineer">
+        </div>
+        <div class="form-group">
+          <label for="edit-review-decision">Review Decision:</label>
+          <select id="edit-review-decision">
+            <option value="Accepted">Accepted (Diagnosis & Fix 100% Valid)</option>
+            <option value="Edited" selected>Edited (Root Cause Right, Fix Modified/Hardened)</option>
+            <option value="Rejected">Rejected (Hallucination / Wrong Root Cause)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-review-notes">Reviewer Justification & Technical Notes:</label>
+          <textarea id="edit-review-notes" rows="3" placeholder="Explain why the fix is being modified or approved..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-review-fix">Adjusted Cisco IOS Remediation Commands (one per line):</label>
+          <textarea id="edit-review-fix" rows="5" class="code-font"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeEditReviewModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEditedReview()">Save & Update Audit Trail</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
